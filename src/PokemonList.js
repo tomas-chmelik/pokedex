@@ -10,11 +10,15 @@ const PokemonList = () => {
   const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
   useEffect(() => {
     getPokemonList(limit, offset).then(async (data) => {
       const promises = data.results.map(async (p) => {
         const details = await getPokemonDetails(p.name);
-        return { ...p, image: details.sprites.other.dream_world.front_default };
+        return { ...p, image: details.sprites.other.dream_world.front_default, name: capitalizeFirstLetter(p.name)};
       });
       const results = await Promise.all(promises);
       setPokemon(results);
@@ -22,7 +26,7 @@ const PokemonList = () => {
   }, [offset, limit]);
 
   const handlePokemonClick = (pokemonName) => {
-    getPokemonDetails(pokemonName).then(data => {
+    getPokemonDetails(pokemonName.toLowerCase()).then(data => {
       setSelectedPokemon(data);
       setShowModal(true);
     });
